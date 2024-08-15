@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="url"] {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #statusDisplay p {
+            background-color: #ecf0f1;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status-up {
+            color: #27ae60;
+        }
+        .status-down {
+            color: #c0392b;
+        }
+        .remove-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Website Monitor</h1>
+    <form id="monitorForm">
+        <input type="url" id="urlInput" required placeholder="Enter URL to monitor">
+        <button type="submit">Start Monitoring</button>
+    </form>
+    <div id="statusDisplay"></div>
+
+    <script>
+        const form = document.getElementById('monitorForm');
+        const statusDisplay = document.getElementById('statusDisplay');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            await axios.post('/', new URLSearchParams({url}));
+            updateStatus();
+        });
+
+        async function updateStatus() {
+            const response = await axios.get('/status');
+            statusDisplay.innerHTML = Object.entries(response.data)
+                .map(([url, status]) => {
+                    const statusClass = status.includes('Up') ? 'status-up' : 'status-down';
+                    return `
+                        <p>
+                            ${url}: <span class="${statusClass}">${status}</span>
+                            <button onclick="removeWebsite('${url}')" class="remove-btn">Remove</button>
+                        </p>
+                    `;
+                })
+                .join('');
+        }
+
+        async function removeWebsite(url) {
+            await axios.post(`/remove/${encodeURIComponent(url)}`);
+            updateStatus();
+        }
+
+        updateStatus();
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

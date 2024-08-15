@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "9988:5000"
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=production
+    command: gunicorn --workers=3 --timeout=60 --bind 0.0.0.0:5000 app:app
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: always
