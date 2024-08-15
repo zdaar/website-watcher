@@ -24,7 +24,7 @@ Website Watcher helps you keep an eye on multiple websites, showing their status
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/website-watcher.git
+   git clone https://github.com/zdaar/website-watcher.git
    cd website-watcher
    ```
 
